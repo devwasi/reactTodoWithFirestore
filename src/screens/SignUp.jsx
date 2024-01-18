@@ -1,8 +1,9 @@
 import { Button, Divider, Stack, TextField, Typography } from '@mui/material'
 import { createUserWithEmailAndPassword } from 'firebase/auth'
 import React, { useState } from 'react'
-import { auth } from '../config/firebase'
+import { auth, db } from '../config/firebase'
 import { useNavigate } from 'react-router-dom'
+import { doc, setDoc } from 'firebase/firestore'
 
 const Login = () => {
     const [name, setName] = useState("")
@@ -14,9 +15,15 @@ const Login = () => {
 
     const signUpHandler = async ()=>{
         try {
-          await  createUserWithEmailAndPassword(auth, email,password).then(userCredentials=>{
+          await  createUserWithEmailAndPassword(auth, email,password).then(async userCredentials=>{
                 console.log(userCredentials)    
-                navigate("/todo")
+                const userObj = {
+                    name,
+                    email
+                }
+                // set user data in database
+                await setDoc(doc(db,"users",userCredentials.user.uid),userObj)
+                navigate("/")
             }
                 ).catch(error=>{
                     console.log(error)

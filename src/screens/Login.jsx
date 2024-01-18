@@ -1,8 +1,9 @@
 import { Button, Divider, Stack, TextField, Typography } from '@mui/material'
 import { createUserWithEmailAndPassword, signInWithEmailAndPassword } from 'firebase/auth'
 import React, { useState } from 'react'
-import { auth } from '../config/firebase'
-import { useNavigate } from 'react-router-dom'
+import { auth, db } from '../config/firebase'
+import { json, useNavigate } from 'react-router-dom'
+import { doc, getDoc } from 'firebase/firestore'
 
 const Login = () => {
     const [email, setEmail] = useState("")
@@ -13,9 +14,12 @@ const Login = () => {
 
     const loginHandler = async ()=>{
         try {
-          await  signInWithEmailAndPassword(auth, email,password).then(userCredentials=>{
-                console.log(userCredentials)    
+          await  signInWithEmailAndPassword(auth, email,password).then(async userCredentials=>{
+                console.log(userCredentials.user.uid)
                 navigate("/todo")
+                localStorage.setItem("uid",userCredentials.user.uid);
+                const docData = await getDoc(doc(db,"users", userCredentials.user.uid))
+                localStorage.setItem("userData",JSON.stringify(docData.data()))
             }
                 ).catch(error=>{
                     console.log(error)
