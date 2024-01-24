@@ -1,12 +1,15 @@
 import { Button, Divider, Stack, TextField, Typography } from '@mui/material'
-import { addDoc, collection, deleteDoc, doc, getDocs, updateDoc } from 'firebase/firestore'
+import { addDoc, collection, deleteDoc, doc, getDocs, setDoc, updateDoc } from 'firebase/firestore'
 import React, { useEffect, useState } from 'react'
-import { db } from '../config/firebase'
+import { auth, db } from '../config/firebase'
+import { signOut } from 'firebase/auth'
+import { useNavigate } from 'react-router-dom'
 
 const TodoMain = () => {
     const[todo, setTodo] = useState("")
     const[todoData, setTodoData] = useState([])
     const[refresh, setRefresh] = useState(false)
+    const navigate = useNavigate()
 
 const getTodoData = async ()=>{
     const arr = []
@@ -33,18 +36,24 @@ const getTodoData = async ()=>{
 
     // add todo
     const addTodoHandler = async ()=>{
-        console.log("runn")
+        if(todo === ""){
+            console.log("emty")
+            return
+        } else{
         try {
             const obj = {
                 todo,
             }
+           const uId = localStorage.getItem("uid")
 
-            await addDoc(collection(db,"todo"),obj)
+            await setDoc(doc(db,"todo",uId),obj)
             setRefresh(!refresh)
+            setTodo("")
             
         } catch (error) {
             console.log(error)
         }
+    }
     }
 
     // edit todo
@@ -76,13 +85,25 @@ todo: editValue
         }
     }
 
+    const signOutHandler = ()=>{
+        signOut(auth)
+        localStorage.clear()
+        navigate("/")
+    }
+
   return (
     <>
 
     <Stack sx={{boxShadow: "0 0 5px black", maxWidth: 450, flexWrap: "wrap", justifyContent: "center", padding: 2, rowGap: 2, borderRadius: 2, mx: "auto"}}>
 
+    <Stack sx={{position: "fixed", top:2 , right: 2}}>
+        <Button onClick={signOutHandler}>
+            Sign Out
+        </Button>
+    </Stack>
+
     <Stack sx={{boxShadow: "0 0 5px black ", flexDirection: "row", justifyContent: "space-between", borderRadius: 2,}}>
-        <TextField fullWidth placeholder='Enter Todo' onChange={e=>setTodo(e.target.value)} />
+        <TextField fullWidth value={todo} placeholder='Enter Todo' onChange={e=>setTodo(e.target.value)} />
             <Button onClick={addTodoHandler}>Add</Button>
     </Stack>
 

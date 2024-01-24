@@ -1,12 +1,13 @@
-import { createUserWithEmailAndPassword } from "firebase/auth";
-import React, { useState } from "react";
-import { auth } from "./config/firebase";
+import React from "react";
 import { Route, Routes } from "react-router-dom";
 import Login from "./screens/Login";
 import TodoMain from "./screens/TodoMain";
 import SignUp from "./screens/SignUp";
 import AuthRoute from "./routes/authRoutes";
 import ProtectedRoutes from "./routes/protectedRoute";
+import { ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
+
 
 const App = () => {
   return <>
@@ -20,6 +21,21 @@ const App = () => {
     </Route>
       
   </Routes>
+
+  <ToastContainer
+position="top-right"
+autoClose={5000}
+hideProgressBar={false}
+newestOnTop={false}
+closeOnClick
+rtl={false}
+pauseOnFocusLoss
+draggable
+pauseOnHover
+theme="light"
+/>
+{/* Same as */}
+<ToastContainer />
   </>
 };
 
