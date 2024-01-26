@@ -1,5 +1,5 @@
 import { Button, Divider, Stack, TextField, Typography } from '@mui/material'
-import { createUserWithEmailAndPassword, signInWithEmailAndPassword } from 'firebase/auth'
+import { GithubAuthProvider, createUserWithEmailAndPassword, signInWithEmailAndPassword } from 'firebase/auth'
 import React, { useState } from 'react'
 import { auth, db } from '../config/firebase'
 import { json, useNavigate } from 'react-router-dom'
@@ -18,7 +18,6 @@ const Login = () => {
     const loginHandler = async ()=>{
         try {
           await  signInWithEmailAndPassword(auth, email,password).then(async userCredentials=>{
-                console.log(userCredentials.user.uid)
                 navigate("/todo")
                 localStorage.setItem("uid",userCredentials.user.uid);
                 const docData = await getDoc(doc(db,"users", userCredentials.user.uid))
@@ -58,8 +57,6 @@ const Login = () => {
         const provider = new GoogleAuthProvider();
         await signInWithPopup(auth, provider)
           .then(async(result) => {
-            const credential = GoogleAuthProvider.credentialFromResult(result);
-            console.log("credentials===>", credential)
             // The signed-in user info.
             const userUId = result.user.uid;
             const email = result.user.email
@@ -73,9 +70,6 @@ const Login = () => {
             localStorage.setItem("uid",userUId);
             localStorage.setItem("userData",JSON.stringify(userObj))
             navigate("/todo")
-            // get users data from database
-                // const docData = await getDoc(doc(db,"users", userUId))
-            console.log("user===>", user.uid)
             
           }).catch((error) => {
             toast.error(error.code, {
@@ -110,8 +104,6 @@ const Login = () => {
             const provider = new GithubAuthProvider();
             await signInWithPopup(auth, provider)
               .then(async(result) => {
-                const credential = GithubAuthProvider.credentialFromResult(result);
-                console.log("credentials===>", credential)
                 // The signed-in user info.
                 const userUId = result.user.uid;
                 const email = result.user.email
@@ -125,9 +117,6 @@ const Login = () => {
                 localStorage.setItem("uid",userUId);
                 localStorage.setItem("userData",JSON.stringify(userObj))
                 navigate("/todo")
-                // get users data from database
-                    // const docData = await getDoc(doc(db,"users", userUId))
-                console.log("user===>", user.uid)
                 
               }).catch((error) => {
                 toast.error(error.code, {

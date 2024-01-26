@@ -4,6 +4,7 @@ import React, { useEffect, useState } from 'react'
 import { auth, db } from '../config/firebase'
 import { signOut } from 'firebase/auth'
 import { useNavigate } from 'react-router-dom'
+import { toast } from 'react-toastify'
 
 const TodoMain = () => {
     const[todo, setTodo] = useState("")
@@ -11,10 +12,13 @@ const TodoMain = () => {
     const[refresh, setRefresh] = useState(false)
     const navigate = useNavigate()
 
+
+    const uid = localStorage.getItem("uid")
+
 const getTodoData = async ()=>{
     const arr = []
     try {
-        const docSnap = await getDocs(collection(db,"todo"))
+        const docSnap = await getDocs(collection(db,"users",uid,"todos"))
 
         docSnap.forEach(doc=>{
             arr.push({
@@ -25,9 +29,17 @@ const getTodoData = async ()=>{
         setTodoData([...arr])
         
     } catch (error) {
-        console.log(error)
+        toast.error(error.code, {
+            position: "top-center",
+            autoClose: 5000,
+            hideProgressBar: false,
+            closeOnClick: true,
+            pauseOnHover: true,
+            draggable: true,
+            progress: undefined,
+            theme: "light",
+            });
     }
-    console.log("tododata", todoData)
 }
 
     useEffect(()=>{
@@ -37,21 +49,38 @@ const getTodoData = async ()=>{
     // add todo
     const addTodoHandler = async ()=>{
         if(todo === ""){
-            console.log("emty")
+            toast.error("add something ", {
+                position: "top-center",
+                autoClose: 5000,
+                hideProgressBar: false,
+                closeOnClick: true,
+                pauseOnHover: true,
+                draggable: true,
+                progress: undefined,
+                theme: "light",
+                });
             return
         } else{
         try {
             const obj = {
                 todo,
             }
-           const uId = localStorage.getItem("uid")
-
-            await setDoc(doc(db,"todo",uId),obj)
+            const randomId = Math.floor(Math.random()*1236583546464).toString()
+            await setDoc(doc(db,"users",uid,"todos",randomId),obj)
             setRefresh(!refresh)
             setTodo("")
             
         } catch (error) {
-            console.log(error)
+            toast.error(error.code, {
+                position: "top-center",
+                autoClose: 5000,
+                hideProgressBar: false,
+                closeOnClick: true,
+                pauseOnHover: true,
+                draggable: true,
+                progress: undefined,
+                theme: "light",
+                });
         }
     }
     }
@@ -65,23 +94,40 @@ const editValue = prompt("enter edit todo")
 const updateObj = {
 todo: editValue
 }
-        await updateDoc(doc(db,"todo",id),updateObj)
+        await updateDoc(doc(db,"users",uid,"todos",id),updateObj)
 
         setRefresh(!refresh)
         } catch (error) {
-            console.log(error)
+            toast.error(error.code, {
+                position: "top-center",
+                autoClose: 5000,
+                hideProgressBar: false,
+                closeOnClick: true,
+                pauseOnHover: true,
+                draggable: true,
+                progress: undefined,
+                theme: "light",
+                });
         }
     }
 
     const deleteTodo = async(id)=>{
-        console.log("runn")
         try {
             
-        await deleteDoc(doc(db, "todo", id));
+        await deleteDoc(doc(db, "users",uid,"todos", id));
         setRefresh(!refresh)
             
         } catch (error) {
-            console.log(error)
+            toast.error(error.code, {
+                position: "top-center",
+                autoClose: 5000,
+                hideProgressBar: false,
+                closeOnClick: true,
+                pauseOnHover: true,
+                draggable: true,
+                progress: undefined,
+                theme: "light",
+                });
         }
     }
 
